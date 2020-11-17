@@ -3,7 +3,5 @@
 .env
 /models/CentralBank.js
 /models/Transactions.js
-/models/Account.js
-/routes/accountRoutes.js
 /routes/transactionRoutes.js
 /routes/transactionRoutes.js.save
