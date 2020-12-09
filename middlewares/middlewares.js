@@ -150,6 +150,22 @@ exports.processTransactions = async() => {
         // Send request to remote bank
         try {
 
+            const nock = require('nock')
+            let nockScope
+
+             if (process.env.TEST_MODE === 'true') {
+
+                 const nockUrl = new URL(bankTo.transactionUrl)
+
+                 console.log('Nocking '+ JSON.stringify(nockUrl));
+
+                 nockScope = nock(`${nockUrl.protocol}//${nockUrl.host}`)
+                    .persist()
+                    .post(nockUrl.pathname)
+                    .reply(200, {receiverName: 'Jaanus'})
+
+             }
+
             console.log('loop: Making request to ' + bankTo.transactionUrl);
 
             // Abort connection after 1 second
@@ -242,8 +258,38 @@ exports.processTransactions = async() => {
 
 exports.refreshBanksFromCentralBank = async() => {
 
+    let nockScope, nock
+
     try {
         console.log('Refreshing banks');
+
+// Mock central bank responses in TEST_MODE
+    if (process.env.TEST_MODE === 'true') {
+        nock = require('nock')
+        console.log(process.env.TEST_MODE === 'true');
+        nockScope = nock(process.env.CENTRAL_BANK_URL)
+            .persist()
+            .get('/banks')
+            .reply(200,
+                [
+            {
+                "name": "Swe Bank",
+                "owners": "Margus Tamm",
+                "jwksUrl": "https://sweBank.com/jwks",
+                "transactionUrl": "https://sweBank.com/transactions/b2b",
+                "bankPrefix": "123"
+            },
+            {
+                "name": "Seb",
+                "owners": "Mari Mets",
+                "jwksUrl": "https://seb.com/jwks",
+                "transactionUrl": "https://seb.com/transactions/b2b",
+                "bankPrefix": "456"
+            }
+            ]
+    )
+                }
+       
 
         console.log('Attempting to contact central bank at ' + `${process.env.CENTRAL_BANK_URL}/banks`)
         banks = await fetch(`${process.env.CENTRAL_BANK_URL}/banks`, {
@@ -267,6 +313,6 @@ exports.refreshBanksFromCentralBank = async() => {
     } catch (e) {
         return { error: e.message }
     }
-
+    console.log(e.message);
     return true
 }

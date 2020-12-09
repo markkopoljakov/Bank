@@ -20,7 +20,8 @@
     "node-jose": "^2.0.0",
     "nodemon": "^2.0.6",
     "swagger-ui-express": "^4.1.4",
-    "yamljs": "^0.3.0"
+    "yamljs": "^0.3.0",
+    "nock": "^13.0.4"
   },
   "devDependencies": {
     "axios": "^0.21.0"
